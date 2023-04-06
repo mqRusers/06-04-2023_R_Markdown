@@ -1,0 +1,74 @@
+---
+title: "Lord of the Rings"
+author: "Dr Connor Smith"
+date: "`r Sys.Date()`"
+output: 
+  bookdown::html_document2
+bibliography: lotr_refs.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(forcats)
+library(knitr)
+```
+
+# Data
+
+The following data was downloaded from Jennifer Bryan of GitHub from <https://github.com/jennybc/lotr-tidy>
+
+```{r load_data, echo=FALSE}
+lotr <- read.delim("lotr_clean.tsv")
+
+lotr <- lotr %>% 
+  mutate(Film = factor(Film)) 
+
+levels(lotr$Film) <- c("The Fellowship Of The Ring", "The Two Towers", "The Return Of The King")
+
+# Fill the following information in
+# options: Bilbo, Frodo, Gandalf, Aragorn, Saruman, Lurtz
+fav_char <- "Lurtz"
+```
+
+# Favourite Character
+
+In the Lord of the Rings, my favourite character is `r fav_char`. We can check how many words `r fav_char` spoke during the movie with the folololololowing code:
+
+```{r ugly_code}
+lotr_fav<-lotr%>%filter(Character == fav_char) %>%summarise(Total_Words = sum(Words))
+```
+
+I'm not sure this is correct but it seems that `r fav_char` only spoke `r lotr_fav` words in the entire movie.
+
+# Figure
+
+```{r figure, fig.cap = "Lord of the Rings Movies", fig.height = 5}
+lotr %>% 
+  group_by(Chapter) %>% 
+  summarise(Words = sum(Words), Film = first(Film)) %>%
+  ggplot(aes(x = fct_inorder(Chapter), y = Words)) +
+  geom_point(aes(colour = Film)) +
+  theme(axis.text.x = element_blank()) + 
+  facet_grid(~ fct_inorder(Film)) + 
+  xlab(label = "Movie Chapters") + 
+  ylab(label = "Words Spoken") + 
+  ggtitle("Words spoken in LotR movies")
+```
+
+Figure \@ref(fig:figure) shows ...
+
+# Table
+
+```{r table}
+lotr %>% 
+  group_by(Film) %>% 
+  summarise(Words = sum(Words)) %>% 
+  kable(caption = "Lord of the Rings Movies")
+```
+
+# Comments
+
+Lord of the Rings, Star Wars, and participatory fandom: Mapping new congruencies between the internet and media entertainment culture written by @shefrin2004lord is an interesting article.
+
+# References
